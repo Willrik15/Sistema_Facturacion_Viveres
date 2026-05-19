@@ -52,44 +52,50 @@ Sistema web para gestión de ventas, compras, inventario y facturación electró
    - npm install
 
 3. Configurar variables de entorno:
-  - Crear backend/.env a partir de backend/.env.example
-  - Crear frontend/.env a partir de frontend/.env.example
+   ```bash
+   - Crear backend/.env a partir de backend/.env.example
+   - Crear frontend/.env a partir de frontend/.env.example
 
 4. Configurar base de datos del backend:
-  - cd backend
-  - npx prisma migrate deploy
-  - npx prisma db seed
+   ```bash
+   - cd backend
+   - npx prisma migrate deploy
+   - npx prisma db seed
 
 ## Ejecución
-  Backend
+1. Backend
+    ```bash
     - cd backend
     - npm run start:dev
 
-  frontend
+2. frontend
+    ```bash
     - cd frontend
     - npm run dev
 
 ## Scripts Utiles
-  Backend
+1. Backend
+    ```bash
    - npm run start:dev: iniciar API en modo desarrollo
    - npm run build: compilar backend
    - npm run start:prod: ejecutar compilado
    - npm run lint: ejecutar lint
    - npm run test: ejecutar pruebas
-  Frontend
+2. Frontend
+    ```bash
    - npm run dev: iniciar frontend en desarrollo
    - npm run build: compilar frontend
    - npm run preview: previsualizar build
    - npm run lint: ejecutar lint
 
 ## Variables de Entorno
-  Backend
+1. Backend
    - DATABASE_URL: cadena de conexión a base de datos
    - JWT_SECRET: clave de firma JWT
    - PORT: puerto del backend
    - Variables SRI/correo según configuración del sistema
   
-  Frontend
+2. Frontend
    - VITE_API_URL: URL base del backend
 
 ## Por Seguridad del Sistema

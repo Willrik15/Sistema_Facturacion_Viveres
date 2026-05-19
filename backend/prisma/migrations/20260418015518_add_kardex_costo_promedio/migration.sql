@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "InventarioMovimiento" ADD COLUMN     "costoTotal" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "costoUnitario" DOUBLE PRECISION NOT NULL DEFAULT 0;

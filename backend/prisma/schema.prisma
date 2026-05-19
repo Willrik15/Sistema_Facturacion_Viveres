@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id       Int              @id @default(autoincrement())
+  nombre   String
+  apellido String
+  email    String           @unique
+  password String
+  resetPasswordToken     String?  @unique
+  resetPasswordExpiresAt DateTime?
+  rol      RolUsuario       @default(VENDEDOR)
+  compras  Compra[]
+  consumos ConsumoInterno[]
+  ventas   Venta[]
+}
+
+model Cliente {
+  id                  Int     @id @default(autoincrement())
+  nombre              String
+  cedula              String  @unique
+  tipoIdentificacion  String  @default("CEDULA")
+  telefono            String?
+  email               String?
+  direccion           String?
+  fios     Fio[]
+  ventas   Venta[]
+}
+
+model Proveedor {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  ruc       String     @unique
+  telefono  String
+  compras   Compra[]
+  productos Producto[]
+}
+
+model Producto {
+  id              Int                    @id @default(autoincrement())
+  nombre          String
+  categoria       String?
+  margenGanancia  Float                  @default(25)
+  precio          Float
+  stock           Int
+  proveedorId     Int?
+  stockMinimo     Int                    @default(5)
+  codigoBarras    String?                @unique
+  detallesCompra  DetalleCompra[]
+  detallesConsumo DetalleConsumo[]
+  detallesFio     DetalleFio[]
+  detallesVenta   DetalleVenta[]
+  movimientos     InventarioMovimiento[]
+  proveedor       Proveedor?             @relation(fields: [proveedorId], references: [id])
+}
+
+model Venta {
+  id        Int            @id @default(autoincrement())
+  fecha     DateTime       @default(now())
+  total     Float
+  clienteId Int
+  usuarioId Int
+  estado    EstadoVenta    @default(ACTIVA)
+  detalles  DetalleVenta[]
+  factura   Factura?
+  cliente   Cliente        @relation(fields: [clienteId], references: [id])
+  usuario   Usuario        @relation(fields: [usuarioId], references: [id])
+}
+
+model DetalleVenta {
+  id         Int      @id @default(autoincrement())
+  cantidad   Int
+  subtotal   Float
+  ventaId    Int
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+  venta      Venta    @relation(fields: [ventaId], references: [id])
+}
+
+model Factura {
+  id                 Int       @id @default(autoincrement())
+  fecha              DateTime  @default(now())
+  ventaId            Int?      @unique
+  fioId              Int?      @unique
+  claveAcceso        String    @unique
+  numero             String    @unique
+  xmlAutorizado      String?
+  xmlGenerado        String?
+  estadoSRI          EstadoSRI @default(GENERADA)
+  numeroAutorizacion String?
+  fechaAutorizacion  DateTime?
+  venta              Venta?    @relation(fields: [ventaId], references: [id])
+  fio                Fio?      @relation(fields: [fioId], references: [id])
+}
+
+model InventarioMovimiento {
+  id             Int            @id @default(autoincrement())
+  cantidad       Int
+  fecha          DateTime       @default(now())
+  productoId     Int
+  tipo           TipoMovimiento
+  refId          Int?
+  referencia     String?
+  saldo          Int            @default(0)
+  costoUnitario  Float          @default(0)
+  costoTotal     Float          @default(0)
+  producto       Producto       @relation(fields: [productoId], references: [id])
+}
+
+model Compra {
+  id          Int             @id @default(autoincrement())
+  proveedorId Int
+  usuarioId   Int
+  total       Float
+  fecha       DateTime        @default(now())
+  estado      EstadoCompra    @default(ACTIVA)
+  proveedor   Proveedor       @relation(fields: [proveedorId], references: [id])
+  usuario     Usuario         @relation(fields: [usuarioId], references: [id])
+  detalles    DetalleCompra[]
+}
+
+model DetalleCompra {
+  id            Int      @id @default(autoincrement())
+  compraId      Int
+  productoId    Int
+  cantidad      Int
+  costoUnitario Float
+  subtotal      Float
+  compra        Compra   @relation(fields: [compraId], references: [id])
+  producto      Producto @relation(fields: [productoId], references: [id])
+}
+
+model Fio {
+  id        Int          @id @default(autoincrement())
+  fecha     DateTime     @default(now())
+  total     Float
+  clienteId Int
+  estado    EstadoFio    @default(PENDIENTE)
+  detalles  DetalleFio[]
+  cliente   Cliente      @relation(fields: [clienteId], references: [id])
+  pagos     PagoFio[]
+  factura   Factura?
+}
+
+model DetalleFio {
+  id         Int      @id @default(autoincrement())
+  cantidad   Int
+  precio     Float
+  subtotal   Float
+  fioId      Int
+  productoId Int
+  fio        Fio      @relation(fields: [fioId], references: [id])
+  producto   Producto @relation(fields: [productoId], references: [id])
+}
+
+model PagoFio {
+  id    Int      @id @default(autoincrement())
+  fecha DateTime @default(now())
+  monto Float
+  fioId Int
+  fio   Fio      @relation(fields: [fioId], references: [id])
+}
+
+model ConsumoInterno {
+  id        Int              @id @default(autoincrement())
+  fecha     DateTime         @default(now())
+  motivo    String
+  usuarioId Int
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id])
+  detalles  DetalleConsumo[]
+}
+
+model DetalleConsumo {
+  id         Int            @id @default(autoincrement())
+  cantidad   Int
+  consumoId  Int
+  productoId Int
+  consumo    ConsumoInterno @relation(fields: [consumoId], references: [id])
+  producto   Producto       @relation(fields: [productoId], references: [id])
+}
+
+enum TipoMovimiento {
+  ENTRADA
+  SALIDA
+  AJUSTE
+}
+
+enum EstadoCompra {
+  ACTIVA
+  ANULADA
+}
+
+enum EstadoVenta {
+  ACTIVA
+  ANULADA
+}
+
+enum EstadoFio {
+  PENDIENTE
+  PARCIAL
+  PAGADO
+}
+
+enum EstadoSRI {
+  GENERADA
+  AUTORIZADA
+  RECHAZADA
+  ANULADA
+}
+
+enum RolUsuario {
+  SUPERADMIN
+  ADMIN
+  VENDEDOR
+  BODEGA
+}

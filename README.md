@@ -40,60 +40,62 @@ Sistema web para gestión de ventas, compras, inventario y facturación electró
 ## Instalación
 
 1. Clonar repositorio:
-   ```bash
-   git clone https://github.com/Willrik15/Sistema_Facturacion_Viveres.git
-   cd Sistema_Facturacion_Viveres
+   - ```bash
+   - git clone https://github.com/Willrik15/Sistema_Facturacion_Viveres.git
+   - cd Sistema_Facturacion_Viveres
    
 2. Instalar dependencias:
-  cd backend
-  npm install
-  cd ../frontend
-  npm install
+  - cd backend
+  - npm install
+  
+  - cd ../frontend
+  - npm install
 
 3. Configurar variables de entorno:
-  Crear backend/.env a partir de backend/.env.example
-  Crear frontend/.env a partir de frontend/.env.example
+  - Crear backend/.env a partir de backend/.env.example
+  - Crear frontend/.env a partir de frontend/.env.example
 
 4. Configurar base de datos del backend:
-  cd backend
-  npx prisma migrate deploy
-  npx prisma db seed
+  - cd backend
+  - npx prisma migrate deploy
+  - npx prisma db seed
 
 ## Ejecución
   Backend
-    cd backend
-    npm run start:dev
+    - cd backend
+    - npm run start:dev
 
   frontend
-    cd frontend
-    npm run dev
+    - cd frontend
+    - npm run dev
 
 ## Scripts Utiles
   Backend
-    npm run start:dev: iniciar API en modo desarrollo
-    npm run build: compilar backend
-    npm run start:prod: ejecutar compilado
-    npm run lint: ejecutar lint
-    npm run test: ejecutar pruebas
+   - npm run start:dev: iniciar API en modo desarrollo
+   - npm run build: compilar backend
+   - npm run start:prod: ejecutar compilado
+   - npm run lint: ejecutar lint
+   - npm run test: ejecutar pruebas
   Frontend
-    npm run dev: iniciar frontend en desarrollo
-    npm run build: compilar frontend
-    npm run preview: previsualizar build
-    npm run lint: ejecutar lint
+   - npm run dev: iniciar frontend en desarrollo
+   - npm run build: compilar frontend
+   - npm run preview: previsualizar build
+   - npm run lint: ejecutar lint
 
 ## Variables de Entorno
   Backend
-    DATABASE_URL: cadena de conexión a base de datos
-    JWT_SECRET: clave de firma JWT
-    PORT: puerto del backend
-    Variables SRI/correo según configuración del sistema
+   - DATABASE_URL: cadena de conexión a base de datos
+   - JWT_SECRET: clave de firma JWT
+   - PORT: puerto del backend
+   - Variables SRI/correo según configuración del sistema
+  
   Frontend
-    VITE_API_URL: URL base del backend
+   - VITE_API_URL: URL base del backend
 
 ## Por Seguridad del Sistema
-  No está subido el archivo .env .
-  No está subido certificados ni claves privadas como (.p12, .key, .pem).
-  Se uso secretos diferentes para desarrollo, pruebas y producción.
+ - No está subido el archivo .env .
+ - No está subido certificados ni claves privadas como (.p12, .key, .pem).
+ - Se uso secretos diferentes para desarrollo, pruebas y producción.
 
 Este proyecto es software propietario.
 Copyright (c) 2026 Erik López. Todos los derechos reservados.

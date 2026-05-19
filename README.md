@@ -40,16 +40,16 @@ Sistema web para gestión de ventas, compras, inventario y facturación electró
 ## Instalación
 
 1. Clonar repositorio:
-   - ```bash
+   ```bash
    - git clone https://github.com/Willrik15/Sistema_Facturacion_Viveres.git
    - cd Sistema_Facturacion_Viveres
    
 2. Instalar dependencias:
-  - cd backend
-  - npm install
-  
-  - cd ../frontend
-  - npm install
+   ```bash
+   - cd backend
+   - npm install
+   - cd ../frontend
+   - npm install
 
 3. Configurar variables de entorno:
   - Crear backend/.env a partir de backend/.env.example

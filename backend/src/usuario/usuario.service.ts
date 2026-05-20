@@ -12,12 +12,25 @@ import { Prisma, RolUsuario } from '@prisma/client';
 
 type SessionUser = {
   id: number;
-  rol: RolUsuario;
+  rol: RolUsuario | string;
 };
 
 @Injectable()
 export class UsuarioService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private normalizeRole(role: RolUsuario | string): RolUsuario {
+    const normalized = String(role || '').trim().toUpperCase();
+
+    if (normalized === 'SUPERADMIN' || normalized === 'SUPER_ADMIN') {
+      return RolUsuario.SUPERADMIN;
+    }
+    if (normalized === 'ADMIN') return RolUsuario.ADMIN;
+    if (normalized === 'VENDEDOR') return RolUsuario.VENDEDOR;
+    if (normalized === 'BODEGA') return RolUsuario.BODEGA;
+
+    throw new ForbiddenException('Rol de usuario inválido en la sesión');
+  }
 
   private assertRoleManagement(
     actor: SessionUser,
@@ -31,19 +44,22 @@ export class UsuarioService {
       );
     }
 
-    if (actor.rol === RolUsuario.SUPERADMIN) {
+    const actorRole = this.normalizeRole(actor.rol);
+    const normalizedTargetRole = this.normalizeRole(targetRole);
+
+    if (actorRole === RolUsuario.SUPERADMIN) {
       return;
     }
 
-    if (actor.rol !== RolUsuario.ADMIN) {
+    if (actorRole !== RolUsuario.ADMIN) {
       throw new ForbiddenException(
         'No tienes permisos para gestionar usuarios',
       );
     }
 
     if (
-      targetRole === RolUsuario.ADMIN ||
-      targetRole === RolUsuario.SUPERADMIN
+      normalizedTargetRole === RolUsuario.ADMIN ||
+      normalizedTargetRole === RolUsuario.SUPERADMIN
     ) {
       throw new ForbiddenException(
         `Un ADMIN no puede ${action} usuarios con rol ADMIN o SUPERADMIN`,

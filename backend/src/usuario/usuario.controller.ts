@@ -20,7 +20,7 @@ import type { JwtUser } from '../auth/interfaces/jwt-payload.interface';
 
 @Controller('usuarios')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('ADMIN', 'SUPERADMIN')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 

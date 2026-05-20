@@ -27,7 +27,8 @@ export class AuthService {
     const passwordValid = await bcrypt.compare(data.password, user.password);
     if (!passwordValid)
       throw new UnauthorizedException('Credenciales inválidas');
-    if (!user.activo) {
+    const isInactive = (user as { activo?: boolean }).activo === false;
+    if (isInactive) {
       throw new UnauthorizedException(
         'Tu cuenta está desactivada. Contacta al administrador.',
       );

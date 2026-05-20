@@ -164,12 +164,44 @@ export class UsuarioService {
   }
 
   async remove(id: number, actor: SessionUser) {
-    const target = await this.prisma.usuario.findUnique({ where: { id } });
+    const target = await this.prisma.usuario.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        rol: true,
+        _count: {
+          select: {
+            compras: true,
+            consumos: true,
+            ventas: true,
+          },
+        },
+      },
+    });
     if (!target) throw new NotFoundException('Usuario no encontrado');
 
     this.assertRoleManagement(actor, target.rol, 'eliminar', target.id);
 
-    await this.prisma.usuario.delete({ where: { id } });
+    const totalDependencias =
+      target._count.compras + target._count.consumos + target._count.ventas;
+
+    if (totalDependencias > 0) {
+      throw new ConflictException(
+        'No se puede eliminar este usuario porque tiene registros asociados (ventas, compras o consumos internos).',
+      );
+    }
+
+    try {
+      await this.prisma.usuario.delete({ where: { id } });
+    } catch (error: any) {
+      if (error?.code === 'P2003') {
+        throw new ConflictException(
+          'No se puede eliminar este usuario porque tiene registros asociados.',
+        );
+      }
+      throw error;
+    }
+
     return { message: 'Usuario eliminado correctamente' };
   }
 }

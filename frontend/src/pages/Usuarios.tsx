@@ -17,6 +17,11 @@ const ROL_COLORS: Record<RolUsuario, string> = {
   BODEGA: 'bg-green-100 text-green-800',
 }
 
+const STATUS_COLORS = {
+  activo: 'bg-emerald-100 text-emerald-800',
+  inactivo: 'bg-gray-100 text-gray-700',
+}
+
 const emptyForm: CreateUsuarioRequest = {
   nombre: '',
   apellido: '',
@@ -90,13 +95,23 @@ export function UsuariosPage() {
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Seguro que deseas eliminar este usuario?')) return
+    if (!confirm('¿Seguro que deseas desactivar este usuario?')) return
     try {
       await usuarioService.remove(id)
       await loadUsuarios()
     } catch (err: any) {
       const msg = err?.response?.data?.message
       setError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al eliminar usuario'))
+    }
+  }
+
+  const handleReactivate = async (id: number) => {
+    try {
+      await usuarioService.reactivate(id)
+      await loadUsuarios()
+    } catch (err: any) {
+      const msg = err?.response?.data?.message
+      setError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al reactivar usuario'))
     }
   }
 
@@ -133,6 +148,7 @@ export function UsuariosPage() {
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">Nombre</th>
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">Email</th>
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">Rol</th>
+                  <th className="text-left px-6 py-3 text-gray-600 font-semibold">Estado</th>
                   <th className="text-left px-6 py-3 text-gray-600 font-semibold">Acciones</th>
                 </tr>
               </thead>
@@ -150,6 +166,13 @@ export function UsuariosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${u.activo ? STATUS_COLORS.activo : STATUS_COLORS.inactivo}`}
+                      >
+                        {u.activo ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <div className="flex gap-2">
                         {(isSuperAdmin || (u.rol !== 'ADMIN' && u.rol !== 'SUPERADMIN')) && (
                           <>
@@ -159,12 +182,21 @@ export function UsuariosPage() {
                             >
                               Editar
                             </button>
-                            <button
-                              onClick={() => handleDelete(u.id)}
-                              className="text-red-600 hover:text-red-800 text-xs font-medium"
-                            >
-                              Eliminar
-                            </button>
+                            {u.activo ? (
+                              <button
+                                onClick={() => handleDelete(u.id)}
+                                className="text-red-600 hover:text-red-800 text-xs font-medium"
+                              >
+                                Desactivar
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleReactivate(u.id)}
+                                className="text-emerald-700 hover:text-emerald-900 text-xs font-medium"
+                              >
+                                Reactivar
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
@@ -173,7 +205,7 @@ export function UsuariosPage() {
                 ))}
                 {usuarios.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center text-gray-400">
+                    <td colSpan={6} className="py-12 text-center text-gray-400">
                       No hay usuarios registrados
                     </td>
                   </tr>

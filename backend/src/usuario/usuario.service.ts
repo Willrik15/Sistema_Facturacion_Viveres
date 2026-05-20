@@ -74,6 +74,7 @@ export class UsuarioService {
         nombre: true,
         apellido: true,
         email: true,
+        activo: true,
         rol: true,
       },
       orderBy: { id: 'asc' },
@@ -89,6 +90,7 @@ export class UsuarioService {
         nombre: true,
         apellido: true,
         email: true,
+        activo: true,
         rol: true,
       },
     });
@@ -113,6 +115,7 @@ export class UsuarioService {
         apellido: dto.apellido,
         email: dto.email,
         password: hashedPassword,
+        activo: true,
         rol: roleToAssign,
       },
       select: {
@@ -120,6 +123,7 @@ export class UsuarioService {
         nombre: true,
         apellido: true,
         email: true,
+        activo: true,
         rol: true,
       },
     });
@@ -157,6 +161,7 @@ export class UsuarioService {
         nombre: true,
         apellido: true,
         email: true,
+        activo: true,
         rol: true,
       },
     });
@@ -166,42 +171,21 @@ export class UsuarioService {
   async remove(id: number, actor: SessionUser) {
     const target = await this.prisma.usuario.findUnique({
       where: { id },
-      select: {
-        id: true,
-        rol: true,
-        _count: {
-          select: {
-            compras: true,
-            consumos: true,
-            ventas: true,
-          },
-        },
-      },
+      select: { id: true, rol: true, activo: true },
     });
     if (!target) throw new NotFoundException('Usuario no encontrado');
 
     this.assertRoleManagement(actor, target.rol, 'eliminar', target.id);
 
-    const totalDependencias =
-      target._count.compras + target._count.consumos + target._count.ventas;
-
-    if (totalDependencias > 0) {
-      throw new ConflictException(
-        'No se puede eliminar este usuario porque tiene registros asociados (ventas, compras o consumos internos).',
-      );
+    if (!target.activo) {
+      return { message: 'El usuario ya estaba desactivado' };
     }
 
-    try {
-      await this.prisma.usuario.delete({ where: { id } });
-    } catch (error: any) {
-      if (error?.code === 'P2003') {
-        throw new ConflictException(
-          'No se puede eliminar este usuario porque tiene registros asociados.',
-        );
-      }
-      throw error;
-    }
+    await this.prisma.usuario.update({
+      where: { id },
+      data: { activo: false },
+    });
 
-    return { message: 'Usuario eliminado correctamente' };
+    return { message: 'Usuario desactivado correctamente' };
   }
 }

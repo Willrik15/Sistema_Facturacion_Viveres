@@ -13,6 +13,7 @@ model Usuario {
   apellido String
   email    String           @unique
   password String
+  activo   Boolean          @default(true)
   resetPasswordToken     String?  @unique
   resetPasswordExpiresAt DateTime?
   rol      RolUsuario       @default(VENDEDOR)

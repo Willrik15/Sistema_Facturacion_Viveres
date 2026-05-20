@@ -7,6 +7,7 @@ export interface Usuario {
   nombre: string
   apellido: string
   email: string
+  activo: boolean
   rol: RolUsuario
 }
 
@@ -24,6 +25,7 @@ export interface UpdateUsuarioRequest {
   email?: string
   password?: string
   rol?: RolUsuario
+  activo?: boolean
 }
 
 export const usuarioService = {
@@ -49,5 +51,10 @@ export const usuarioService = {
 
   remove: async (id: number): Promise<void> => {
     await apiClient.delete(`/usuarios/${id}`)
+  },
+
+  reactivate: async (id: number): Promise<Usuario> => {
+    const { data } = await apiClient.put<Usuario>(`/usuarios/${id}`, { activo: true })
+    return data
   },
 }

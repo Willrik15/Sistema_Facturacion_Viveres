@@ -27,6 +27,11 @@ export class AuthService {
     const passwordValid = await bcrypt.compare(data.password, user.password);
     if (!passwordValid)
       throw new UnauthorizedException('Credenciales inválidas');
+    if (!user.activo) {
+      throw new UnauthorizedException(
+        'Tu cuenta está desactivada. Contacta al administrador.',
+      );
+    }
     const payload = { sub: user.id, email: user.email, rol: user.rol };
     return {
       access_token: this.jwtService.sign(payload),

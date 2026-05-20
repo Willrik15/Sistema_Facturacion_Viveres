@@ -22,17 +22,19 @@ export class AuthService {
     const normalizedEmail = data.email.trim().toLowerCase();
     const user = await this.prisma.usuario.findUnique({
       where: { email: normalizedEmail },
+      select: {
+        id: true,
+        email: true,
+        nombre: true,
+        apellido: true,
+        password: true,
+        rol: true,
+      },
     });
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
     const passwordValid = await bcrypt.compare(data.password, user.password);
     if (!passwordValid)
       throw new UnauthorizedException('Credenciales inválidas');
-    const isInactive = (user as { activo?: boolean }).activo === false;
-    if (isInactive) {
-      throw new UnauthorizedException(
-        'Tu cuenta está desactivada. Contacta al administrador.',
-      );
-    }
     const payload = { sub: user.id, email: user.email, rol: user.rol };
     return {
       access_token: this.jwtService.sign(payload),

@@ -29,7 +29,7 @@ function ProtectedRoute({
   const { isAuthenticated, user } = useAuthStore()
   if (!isAuthenticated) return <Navigate to="/login" />
   if (!canAccess(user?.rol as Role | undefined, path)) {
-    return <Navigate to="/" />
+    return <Navigate to="/dashboard" />
   }
   return <>{children}</>
 }
@@ -49,13 +49,14 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
-  <Route path="/reset-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ForgotPasswordPage />} />
 
         <Route
-          path="/"
+          path="/dashboard"
           element={
-            <ProtectedRoute path="/">
+            <ProtectedRoute path="/dashboard">
               <Dashboard />
             </ProtectedRoute>
           }
@@ -160,7 +161,7 @@ export function App() {
           }
         />
 
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )

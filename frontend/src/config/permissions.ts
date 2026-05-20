@@ -12,7 +12,7 @@ export interface RoutePermission {
 
 // Permisos de rutas — qué roles pueden ACCEDER a cada ruta
 export const ROUTE_PERMISSIONS: RoutePermission[] = [
-  { path: '/',                roles: ['ADMIN', 'VENDEDOR', 'BODEGA'] },
+  { path: '/dashboard',       roles: ['ADMIN', 'VENDEDOR', 'BODEGA'] },
   { path: '/ventas',          roles: ['ADMIN', 'VENDEDOR'] },
   { path: '/inventario',      roles: ['ADMIN', 'VENDEDOR', 'BODEGA'] },
   { path: '/compras',         roles: ['ADMIN', 'BODEGA'] },

@@ -38,7 +38,7 @@ export function LoginPage() {
       }
       
       // Redirigir al dashboard
-      navigate('/')
+      navigate('/dashboard')
     } catch (err: any) {
       const errorMsg = getErrorMessage(err)
       setError(errorMsg || 'Error al iniciar sesión. Verifica tus credenciales.')
